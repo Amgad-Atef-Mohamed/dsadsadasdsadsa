@@ -21,6 +21,7 @@ export default class AuthenticationController extends BaseController {
 
   public applyRoutes() {
     this.router.post('/register', this.register.bind(this))
+    this.router.patch('/password', this.setPassword.bind(this))
 
     return this.router
   }
@@ -52,6 +53,44 @@ export default class AuthenticationController extends BaseController {
       }
 
       await this.authenticationService.register(req.body)
+
+      return super.render(res, 201)
+    }
+    catch (e) {
+      console.log('err', e)
+      this.errorManagementService.handle(res, e)
+    }
+  }
+
+  /**
+   * set user Password handler.
+   *
+   * @class AuthenticationController
+   * @method setPassword
+   * @public
+   *
+   * @param {Request} req
+   * @param {Response} res
+   *
+   * @return {Promise<Response>}
+   */
+  public async setPassword(req: Request, res: Response): Promise<Response> {
+    try {
+      // TODO validation layer.
+      const schema = Joi.object({
+        OTP: Joi.string().min(4).max(4).required(),
+        email: Joi.string().email().required(),
+        password: Joi.string().min(6).max(64).required(),
+        confirmationPassword: Joi.ref('password'),
+      })
+
+      const {error} = await schema.validate(req.body, { allowUnknown: false })
+
+      if (error) {
+        return super.render(res, 400, { message: error.details.map(i => i.message).join(',') })
+      }
+
+      await this.authenticationService.setNewPassword(req.body)
 
       return super.render(res, 201)
     }

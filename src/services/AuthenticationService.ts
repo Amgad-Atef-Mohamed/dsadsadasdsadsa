@@ -1,5 +1,8 @@
 'use strict'
 
+import * as bcrypt from 'bcrypt'
+import * as config from 'config'
+
 import userRepository from './../repositories/interfaces/userRepository'
 import BadError from './../utilities/errors/BadError'
 
@@ -43,10 +46,27 @@ export default class AuthService {
 
     await this.mailingAdapter.sendOTPMail(email, OTP)
 
-    return this.CacheAdapter.set(cacheKey, OTP, 120)
+    return this.CacheAdapter.set(cacheKey, OTP, config.get('TTL_FOR_OTP'))
   }
 
   private generateOTP(): string {
     return (Math.floor(Math.random() * ((10 * 1000) - 1000)) + 1000).toString()
+  }
+
+  public async setNewPassword({ email, password, OTP }): Promise<any[]> {
+    const cacheKey: string = `${email}_OTP`
+    const OTPExistOnCache: string = await this.CacheAdapter.getByPattern(cacheKey)
+
+    if (OTPExistOnCache !== OTP) {
+      throw new BadError('Security Code Wrong')
+    }
+
+    const salt: string = await bcrypt.genSalt(10)
+    const hashedPassword: string = await bcrypt.hash(password, salt)
+
+    return Promise.all([
+      this.userRepository.setTheNewPasswordByEmail(email, hashedPassword),
+      this.CacheAdapter.delByPattern(cacheKey),
+    ])
   }
 }

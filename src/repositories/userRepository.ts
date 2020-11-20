@@ -17,4 +17,8 @@ module.exports = class UserRepository implements UsersRepositoryInterface  {
   public createNewAccount(name, email) {
     return this.UserModel.create({ name, email })
   }
+
+  public setTheNewPasswordByEmail(email, hashedPassword) {
+    return this.UserModel.updateOne({ email }, { password: hashedPassword })
+  }
 }

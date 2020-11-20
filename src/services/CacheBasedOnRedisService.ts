@@ -24,7 +24,19 @@ export default class CacheBasedOnRedisService implements Cache {
       return util.promisify(this.adapter.keys).bind(this.adapter)(pattern)
     }
 
+    public getByPattern(pattern: string): Promise<string> {
+      return util.promisify(this.adapter.get).bind(this.adapter)(pattern)
+    }
+
     public set(cacheKey: string, OTP: string,  TTL: number): Promise<void> {
       return util.promisify(this.adapter.set).bind(this.adapter)(cacheKey, OTP, 'EX', TTL)
+    }
+
+    public delByPattern(patterns: string[]): Promise<number> {
+        if (!Array.isArray(patterns)) {
+            patterns = [patterns]
+        }
+
+        return util.promisify(this.adapter.del).bind(this.adapter)(...patterns)
     }
 }
