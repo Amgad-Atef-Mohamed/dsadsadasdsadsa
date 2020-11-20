@@ -14,16 +14,16 @@ module.exports = {
   redis: {
     host: process.env.REDIS_HOST || "localhost",
     "port": process.env.REDIS_PORT || 6379,
-    "password": process.env.REDIS_PASS || ''
+    "password": process.env.REDIS_PASS || '',
   },
   mailing: {
     host: 'smtp.gmail.com',
     port: 587,
     secure: false, // true for 465, false for other ports
-    from: process.env.MAIL_USED_TO_SEND_EMAILS,
+    from: process.env.MAIL_USED_TO_SEND_EMAILS || 'amgadatef456@gmail.com',
     auth: {
-      user: process.env.MAIL_USED_TO_SEND_EMAILS, // generated ethereal user
-      pass: process.env.MAIL_USED_TO_SEND_EMAILS_Password // generated ethereal password
+      user: process.env.MAIL_USED_TO_SEND_EMAILS || 'amgadatef456@gmail.com', // generated ethereal user
+      pass: process.env.MAIL_USED_TO_SEND_EMAILS_Password || 'airpodsPro123' // generated ethereal password
     }
   },
   frontEndOrigin: process.env.FRONT_END_ORIGIN || 'http://127.0.0.1:8000',
