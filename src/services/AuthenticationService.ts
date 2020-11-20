@@ -2,6 +2,8 @@
 
 import * as bcrypt from 'bcrypt'
 import * as config from 'config'
+import * as jwt from 'jsonwebtoken'
+import * as _ from 'lodash'
 
 import userRepository from './../repositories/interfaces/userRepository'
 import BadError from './../utilities/errors/BadError'
@@ -68,5 +70,29 @@ export default class AuthService {
       this.userRepository.setTheNewPasswordByEmail(email, hashedPassword),
       this.CacheAdapter.delByPattern(cacheKey),
     ])
+  }
+
+  public async login(payload): Promise<{token, user}> {
+    const {email, password } = payload
+
+    const user = await this.userRepository.findByEmail(email)
+
+    if (!user || !user.password) {
+      throw new BadError('Email or Password is incorrect')
+    }
+
+    const isPasswordMatched: boolean = await bcrypt.compare(password, user.password)
+
+    if (!isPasswordMatched) {
+      throw new BadError('Email or Password is incorrect')
+    }
+
+    const token: string = this.createAuthenticationToken(user)
+
+    return { token, user: _.omit(user, 'password') }
+  }
+
+  private createAuthenticationToken(user): string {
+    return jwt.sign(user, config.get('JWT.SECRET'), { expiresIn: config.get('JWT.TTL') })
   }
 }

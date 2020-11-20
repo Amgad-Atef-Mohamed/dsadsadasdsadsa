@@ -2,6 +2,7 @@
 
 import { Request, Response } from 'express'
 import * as Joi from 'Joi'
+import * as config from 'config'
 import BaseController from './BaseController'
 
 /**
@@ -22,6 +23,7 @@ export default class AuthenticationController extends BaseController {
   public applyRoutes() {
     this.router.post('/register', this.register.bind(this))
     this.router.patch('/password', this.setPassword.bind(this))
+    this.router.post('/login', this.login.bind(this))
 
     return this.router
   }
@@ -99,4 +101,52 @@ export default class AuthenticationController extends BaseController {
       this.errorManagementService.handle(res, e)
     }
   }
+  /**
+   * login handler.
+   *
+   * @class AuthenticationController
+   * @method login
+   * @public
+   *
+   * @param {Request} req
+   * @param {Response} res
+   *
+   * @return {Promise<Response>}
+   */
+  public async login(req: Request, res: Response): Promise<Response> {
+    try {
+      // TODO validation layer.
+      const schema = Joi.object({
+        email: Joi.string().email().required(),
+        password: Joi.string().min(6).max(64).required(),
+      })
+
+      const { error } = await schema.validate(req.body, { allowUnknown: false })
+
+      if (error) {
+        console.log('error', error.details)
+        return super.render(res, 400, { message: error.details.map(i => i.message).join(',') })
+      }
+
+      const {token, user } = await this.authenticationService.login(req.body)
+      // TODO set token in cookie or in set in response object based on user-agent.
+
+      res.cookie('token', token, {
+        domain: '127.0.0.1',
+        httpOnly: true,
+        secure: false,
+        sameSite: true,
+        path: '/',
+        maxAge: config.get('JWT.TTL'),
+      })
+
+      return super.render(res, 200, { user })
+    }
+    catch (e) {
+      console.log('err', e)
+      this.errorManagementService.handle(res, e)
+    }
+  }
+
+
 }

@@ -27,5 +27,9 @@ module.exports = {
     }
   },
   frontEndOrigin: process.env.FRONT_END_ORIGIN || 'http://127.0.0.1:8000',
-  TTL_FOR_OTP: 120
+  TTL_FOR_OTP: 120,
+  JWT: {
+    SECRET: process.env.JWT_SECRET_KEY || 'TEST',
+    TTL: 86400000 // 1day in milliseconds
+  },
 };
