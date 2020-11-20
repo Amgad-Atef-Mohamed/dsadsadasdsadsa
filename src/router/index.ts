@@ -4,6 +4,7 @@ const  IoCContainer = require('../IoCContainer')
 const router: Router = Router()
 
 router.use('/auth', IoCContainer.resolve('AuthenticationController').applyRoutes())
+router.use('/messages', IoCContainer.resolve('ChatController').applyRoutes())
 router.use('*',  (req, res) => {
     return res.status(200).send('this is the root Api')
 })
