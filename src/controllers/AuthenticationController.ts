@@ -125,7 +125,6 @@ export default class AuthenticationController extends BaseController {
       const { error } = await schema.validate(req.body, { allowUnknown: false })
 
       if (error) {
-        console.log('error', error.details)
         return super.render(res, 400, { message: error.details.map(i => i.message).join(',') })
       }
 

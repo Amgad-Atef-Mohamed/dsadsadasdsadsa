@@ -6,8 +6,10 @@ import * as express from 'express'
 import * as helmet from 'helmet'
 import * as http from 'http'
 import * as config from 'config'
-const cookieParser = require('cookie-parser')
 import router from './router'
+
+const cookieParser = require('cookie-parser')
+const  IoCContainer = require('./IoCContainer')
 
 /**
  * @class Server
@@ -55,6 +57,9 @@ export default class Server {
    */
   public startHttpServer(port: number) {
     const httpsServer = http.createServer(this.app)
+    const realTimeAdapter = IoCContainer.resolve('RealTimeCommunicationAdapter')
+    realTimeAdapter.connect(httpsServer)
+    realTimeAdapter.subscribeToNewConnections()
 
     return httpsServer.listen(port)
   }
