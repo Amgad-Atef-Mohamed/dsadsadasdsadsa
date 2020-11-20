@@ -5,6 +5,7 @@ import * as cors from 'cors'
 import * as express from 'express'
 import * as helmet from 'helmet'
 import * as http from 'http'
+import * as config from 'config'
 import router from './router'
 
 /**
@@ -73,8 +74,10 @@ export default class Server {
     this.app.use(helmet())
     this.app.use(bodyParser.json())
     this.app.use(bodyParser.urlencoded({ extended: true }))
-    this.app.use(cors())
-
+    this.app.use(cors({
+      credentials:  true,
+      origin: config.get('frontEndOrigin'),
+    }))
     /** Register application router */
     this.app.use('/', router)
   }
@@ -85,6 +88,7 @@ export default class Server {
     })
 
     process.on('uncaughtException', (error: Error) => {
+      console.log('error', error)
       process.exit(1)
     })
   }

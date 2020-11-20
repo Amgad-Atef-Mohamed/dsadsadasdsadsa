@@ -10,5 +10,21 @@ module.exports = {
   mongoose: {
     debug: true,
     autoIndex: true
-  }
+  },
+  redis: {
+    host: process.env.REDIS_HOST || "localhost",
+    "port": process.env.REDIS_PORT || 6379,
+    "password": process.env.REDIS_PASS || ''
+  },
+  mailing: {
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false, // true for 465, false for other ports
+    from: process.env.MAIL_USED_TO_SEND_EMAILS,
+    auth: {
+      user: process.env.MAIL_USED_TO_SEND_EMAILS, // generated ethereal user
+      pass: process.env.MAIL_USED_TO_SEND_EMAILS_Password // generated ethereal password
+    }
+  },
+  frontEndOrigin: process.env.FRONT_END_ORIGIN || 'http://127.0.0.1:8000',
 };
