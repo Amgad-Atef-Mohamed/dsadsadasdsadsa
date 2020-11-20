@@ -7,6 +7,7 @@ import * as _ from 'lodash'
 
 import userRepository from './../repositories/interfaces/userRepository'
 import BadError from './../utilities/errors/BadError'
+import UnauthorizedError from './../utilities/errors/UnauthorizedError'
 
 import  Cache from '../services/interfaces/Cache'
 import Mailing from '../services/interfaces/Mailing'
@@ -98,5 +99,20 @@ export default class AuthService {
 
   public logout({ email, token }): Promise<void>  {
     return  this.CacheAdapter.set(`${email}_token`, token, config.get('JWT.TTL'))
+  }
+
+  public async isAuthenticated(token): Promise<object> {
+    if (!token) throw new UnauthorizedError('You Have TO Login')
+    const secretKey: string = config.get('JWT.SECRET')
+
+    return new Promise( (resolve, reject) => {
+      jwt.verify(token, secretKey, async (err, decoded) => {
+        if (err) return reject(new UnauthorizedError('You Have TO Login Again'))
+
+        const user = await this.userRepository.findById(decoded._id)
+
+        return resolve(user)
+      })
+    })
   }
 }

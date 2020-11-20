@@ -25,4 +25,8 @@ module.exports = class UserRepository implements UsersRepositoryInterface  {
   public findByEmail(email) {
     return this.UserModel.findOne({ email }).lean()
   }
+
+  public findById(userId) {
+    return this.UserModel.findOne({ _id: userId }).lean()
+  }
 }

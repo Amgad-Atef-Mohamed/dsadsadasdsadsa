@@ -10,6 +10,8 @@ export interface UersRepositoryInterface {
   setTheNewPasswordByEmail(email: string, hashedPassword: string): Promise<void>
 
   findByEmail(email: string): Promise<User>
+
+  findById(userId: string): Promise<User>
 }
 
 export default UersRepositoryInterface
