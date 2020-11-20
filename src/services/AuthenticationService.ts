@@ -95,4 +95,8 @@ export default class AuthService {
   private createAuthenticationToken(user): string {
     return jwt.sign(user, config.get('JWT.SECRET'), { expiresIn: config.get('JWT.TTL') })
   }
+
+  public logout({ email, token }): Promise<void>  {
+    return  this.CacheAdapter.set(`${email}_token`, token, config.get('JWT.TTL'))
+  }
 }

@@ -24,6 +24,7 @@ export default class AuthenticationController extends BaseController {
     this.router.post('/register', this.register.bind(this))
     this.router.patch('/password', this.setPassword.bind(this))
     this.router.post('/login', this.login.bind(this))
+    this.router.post('/logout', this.logout.bind(this))
 
     return this.router
   }
@@ -135,12 +136,39 @@ export default class AuthenticationController extends BaseController {
         domain: '127.0.0.1',
         httpOnly: true,
         secure: false,
-        sameSite: true,
+        sameSite: 'strict',
         path: '/',
         maxAge: config.get('JWT.TTL'),
       })
 
       return super.render(res, 200, { user })
+    }
+    catch (e) {
+      console.log('err', e)
+      this.errorManagementService.handle(res, e)
+    }
+  }
+
+  /**
+   * logout handler.
+   *
+   * @class AuthenticationController
+   * @method logout
+   * @public
+   *
+   * @param {Request} req
+   * @param {Response} res
+   *
+   * @return {Promise<Response>}
+   */
+  public async logout(req: Request, res: Response): Promise<Response> {
+    try {
+      // TODO GET TOKEN from express request object.
+      await this.authenticationService.logout(req.cookies.token)
+
+      res.clearCookie('token')
+
+      return super.render(res, 201 )
     }
     catch (e) {
       console.log('err', e)
