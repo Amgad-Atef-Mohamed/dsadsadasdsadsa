@@ -23,7 +23,7 @@
     "handlebars": "^4.7.6",
     "helmet": "^4.2.0",
     "joi": "^17.3.0",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "lodash": "^4.17.20",
     "mongoose": "^5.8.3",
     "nodemailer": "^6.4.16",
